@@ -1,5 +1,6 @@
 import React from "react";
 import TimeLine from "../../components/TimeLine";
+import TimeLineDemo from "../../components/TimeLineDemo";
 import MainVideo from "../../components/MainVideo";
 import Material from "../../components/Material";
 import TonePainting from "../../components/TonePainting";
@@ -19,6 +20,7 @@ const VideoClip: React.FC = () => {
         <TonePainting />
       </div>
       <TimeLine />
+      {/* <TimeLineDemo /> */}
     </VideoProvider>
   </div>;
 }
