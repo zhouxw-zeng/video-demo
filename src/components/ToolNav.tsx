@@ -11,22 +11,26 @@ const toolOptions = [
   {
     label: "数字人",
     value: "digitalHuman",
-    icon: "icon-digital-human",
+    icon: "doge-icon",
+    currentIcon: "doge-current-icon"
   },
   {
     label: "声线",
     value:"voiceLine",
-    icon: "icon-voice-line",
+    icon: "friend-avatar-female",
+    currentIcon: "friend-avatar-male"
   },
   {
     label: "知识库",
     value: "knowledgeBase",
-    icon: "icon-knowledge-base",
+    icon: "score",
+    currentIcon: "score-active"
   },
   {
     label: "背景库",
     value: "backgroundLibrary",
-    icon: "icon-background-library",
+    icon: "astrology-tabs-icon",
+    currentIcon: "astrology-icon"
   }
 ]
 
@@ -48,7 +52,7 @@ const ToolNav: React.FC<ToolNavProps> = ({value}) => {
             }
             onClick={()=>setCurrentToolNav(item.value)}
           >
-            <img className='w-8 h-8' src={`../assets/icons/${item.icon}.svg`} alt="" />
+            <img className='w-8 h-8' src={`https://zhiwei-suanming.oss-cn-hangzhou.aliyuncs.com/static/icon/${currentToolNav === item.value ? item.currentIcon : item.icon}.png`} alt="" />
             <span>{item.label}</span>
           </div>
         ))

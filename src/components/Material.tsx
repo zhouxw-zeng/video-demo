@@ -35,7 +35,7 @@ const Material: React.FC = () => {
     setCurrentToolNav
   };
   
-  return <div className="w-5/30 h-full overflow-y-auto  shadow rounded-lg flex  text-black">
+  return <div className="w-4/20 h-full overflow-y-auto  shadow rounded-lg flex  text-black">
     <ToolNav value={value}  />
     { renderMainComponent() }
   </div>;

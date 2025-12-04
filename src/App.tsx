@@ -38,6 +38,18 @@ const App: React.FC = () => {
       icon: <InfoCircleOutlined />,
       label: t('about'),
     },
+    {
+      key: '/material',
+      icon: <InfoCircleOutlined />,
+      label: t('material'),
+      children: [
+        {
+          key: '/material/image',
+          icon: <InfoCircleOutlined />,
+          label: t('image'),
+        }
+      ]
+    }
   ];
 
   // 用户下拉菜单
@@ -192,13 +204,16 @@ const App: React.FC = () => {
         {/* 主要内容区域 */}
         <Content style={{
           margin: '24px 16px',
-          padding: 24,
+          padding: 12,
           background: currentTheme === 'dark' ? '#141414' : '#f5f5f5',
           borderRadius: 8,
           minHeight: 280
         }}>
           <AuthGuard>
+            <div className='w-full h-full bg-white rounded-xl'>
+
             <Outlet />
+            </div>
           </AuthGuard>
         </Content>
       </Layout>

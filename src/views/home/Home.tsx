@@ -49,16 +49,16 @@ const Home: React.FC = () => {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      // 模拟API调用
-      setTimeout(() => {
-        const mockUsers: User[] = [
-          { id: 1, name: '张三', email: 'zhangsan@example.com', role: '管理员' },
-          { id: 2, name: '李四', email: 'lisi@example.com', role: '用户' },
-          { id: 3, name: '王五', email: 'wangwu@example.com', role: '用户' },
-        ];
-        setUsers(mockUsers);
-        setLoading(false);
-      }, 1000);
+      // 使用Promise和setTimeout分离，避免阻塞主线程
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      const mockUsers: User[] = [
+        { id: 1, name: '张三', email: 'zhangsan@example.com', role: '管理员' },
+        { id: 2, name: '李四', email: 'lisi@example.com', role: '用户' },
+        { id: 3, name: '王五', email: 'wangwu@example.com', role: '用户' },
+      ];
+      setUsers(mockUsers);
+      setLoading(false);
     } catch (error) {
       console.error('获取用户数据失败:', error);
       setLoading(false);

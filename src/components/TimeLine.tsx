@@ -56,11 +56,11 @@ const TimeLine: React.FC = () => {
     const contentWidth = canvas.width - paddingLeft - paddingRight;
     const pixelsPerSecond = (contentWidth / duration) * zoomLevel;
     const trackHeight = 40;
-    const headerHeight = 30;
+    const headerHeight = 50;
     const trackSpacing = 10;
 
     // 绘制时间刻度
-    ctx.fillStyle = '#fff'; // 刻度值颜色改为白色
+    ctx.fillStyle = '#cccccc'; // 刻度值颜色改为淡灰色
     ctx.font = '12px Arial';
     ctx.textAlign = 'center';
     
@@ -76,13 +76,19 @@ const TimeLine: React.FC = () => {
         // 主刻度（每秒）
         ctx.beginPath();
         ctx.moveTo(x, 0);
-        ctx.lineTo(x, headerHeight);
-        ctx.strokeStyle = '#888';
+        ctx.lineTo(x, headerHeight / 2);
+        ctx.strokeStyle = '#666';
         ctx.stroke();
         
         // 时间标签
         if (time % 5 === 0) {
-          ctx.fillText(`${time}s`, x, headerHeight - 5);
+          // 主刻度标签（淡灰色）
+          ctx.fillStyle = '#888888';
+          // ctx.fillText(`${time}s`, x, headerHeight - 5);
+          ctx.font = '10px Arial';
+          ctx.fillText(`${time}s`, x, headerHeight - 15);
+          // 恢复字体设置
+          ctx.font = '12px Arial';
         }
         
         // 子刻度（每0.5秒）
@@ -91,73 +97,20 @@ const TimeLine: React.FC = () => {
           if (subX >= paddingLeft && subX <= canvas.width - paddingRight) {
             ctx.beginPath();
             ctx.moveTo(subX, 0);
-            ctx.lineTo(subX, headerHeight / 2);
-            ctx.strokeStyle = '#555';
+            ctx.lineTo(subX, headerHeight / 4);
+            ctx.strokeStyle = '#333333';
             ctx.stroke();
           }
         }
       }
     }
 
-    // 绘制播放头（次高层级，低于悬浮线）
-    const playheadX = paddingLeft + currentTime * pixelsPerSecond;
-    if (playheadX >= paddingLeft && playheadX <= canvas.width - paddingRight) {
-      ctx.beginPath();
-      ctx.moveTo(playheadX, 0);
-      ctx.lineTo(playheadX, canvas.height);
-      ctx.strokeStyle = '#ff4444';
-      ctx.lineWidth = 2;
-      ctx.stroke();
-    }
-    
-    // 绘制鼠标悬浮指示器（最高层级）
-    if (hoverX !== null && hoverTime !== null) {
-      const hoverIndicatorX = paddingLeft + hoverTime * pixelsPerSecond;
-      if (hoverIndicatorX >= paddingLeft && hoverIndicatorX <= canvas.width - paddingRight) {
-        // 黄色悬浮线（最高z轴层级）
-        ctx.beginPath();
-        ctx.moveTo(hoverIndicatorX, 0);
-        ctx.lineTo(hoverIndicatorX, canvas.height);
-        ctx.strokeStyle = '#ffcc00'; // 黄色
-        ctx.lineWidth = 2;
-        ctx.stroke();
-        
-        // 黄色悬浮时间标签
-        ctx.fillStyle = '#ffcc00';
-        ctx.font = 'bold 12px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText(
-          `${hoverTime.toFixed(1)}s`,
-          hoverIndicatorX,
-          headerHeight - 15
-        );
-        
-        // 黄色宽度标（显示当前时间位置到悬浮位置的宽度）
-        if (currentTime < hoverTime) {
-          const widthStartX = paddingLeft + currentTime * pixelsPerSecond;
-          const widthEndX = hoverIndicatorX;
-          const width = widthEndX - widthStartX;
-          
-          // 绘制黄色宽度背景
-          ctx.fillStyle = 'rgba(255, 204, 0, 0.2)';
-          ctx.fillRect(widthStartX, 0, width, headerHeight);
-          
-          // 绘制宽度标签
-          ctx.fillStyle = '#ffcc00';
-          ctx.font = '10px Arial';
-          ctx.textAlign = 'center';
-          ctx.fillText(
-            `+${(hoverTime - currentTime).toFixed(1)}s`,
-            widthStartX + width / 2,
-            headerHeight - 20
-          );
-        }
-      }
-    }
 
     // 绘制轨道
-    tracks.forEach((trackItems, trackIndex) => {
-      const trackY = headerHeight + trackIndex * (trackHeight + trackSpacing);
+    let currentY = headerHeight;
+    tracks.forEach((track) => {
+      const trackHeight = track.trackHeight; // 使用轨道的自定义高度
+      const trackY = currentY;
       
       // 轨道背景（带间距）
       ctx.fillStyle = '#333';
@@ -167,8 +120,8 @@ const TimeLine: React.FC = () => {
       ctx.strokeStyle = '#555';
       ctx.strokeRect(paddingLeft, trackY, contentWidth, trackHeight);
       
-      // 绘制轨道项
-      trackItems.forEach((item) => {
+      // 绘制轨道中的多个项目
+      track.items.forEach(item => {
         const itemX = paddingLeft + item.startTime * pixelsPerSecond;
         const itemWidth = item.duration * pixelsPerSecond;
         
@@ -204,16 +157,74 @@ const TimeLine: React.FC = () => {
           }
         }
       });
+      
+      currentY += trackHeight + trackSpacing;
     });
-  }, [zoomLevel, currentTime, duration, tracks, selectedItemId]);
+    
+    // 当前选中节点线
+    const playheadX = paddingLeft + currentTime * pixelsPerSecond;
+    if (playheadX >= paddingLeft && playheadX <= canvas.width - paddingRight) {
+      ctx.beginPath();
+      ctx.moveTo(playheadX, 0);
+      ctx.lineTo(playheadX, canvas.height);
+      ctx.strokeStyle = '#787878';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+    
+    // 鼠标悬浮预览节点线 （黄色）
+    if (hoverX !== null && hoverTime !== null) {
+      const hoverIndicatorX = paddingLeft + hoverTime * pixelsPerSecond;
+      if (hoverIndicatorX >= paddingLeft && hoverIndicatorX <= canvas.width - paddingRight) {
+        // 黄色悬浮线（最高z轴层级）
+        ctx.beginPath();
+        ctx.moveTo(hoverIndicatorX, 0);
+        ctx.lineTo(hoverIndicatorX, canvas.height);
+        ctx.strokeStyle = '#ffcc00'; // 黄色
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        
+        // 黄色悬浮时间标签
+        ctx.fillStyle = '#ffcc00';
+        ctx.font = 'bold 12px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(
+          `${hoverTime.toFixed(1)}s`,
+          hoverIndicatorX,
+          headerHeight - 15
+        );
+        
+        // 黄色宽度标（显示当前时间位置到悬浮位置的宽度）
+        // if (currentTime < hoverTime) {
+          const widthStartX = paddingLeft + currentTime * pixelsPerSecond;
+          const widthEndX = hoverIndicatorX;
+          const width = widthEndX - widthStartX;
+          
+          // 绘制黄色宽度背景
+          ctx.fillStyle = 'rgba(255, 204, 0, 0.2)';
+          ctx.fillRect(widthStartX, 0, width, headerHeight);
+          
+          // 绘制宽度标签
+          ctx.fillStyle = '#ffcc00';
+          ctx.font = '10px Arial';
+          ctx.textAlign = 'center';
+          ctx.fillText(
+            `${(hoverTime - currentTime).toFixed(1)}s`,
+            widthStartX + width / 2,
+            headerHeight - 20
+          );
+        // }
+      }
+    }
+  }, [zoomLevel, currentTime, duration, tracks, selectedItemId, hoverTime, hoverX]);
 
   // 获取轨道项颜色
   const getTrackItemColor = (type: TrackItem['type']): string => {
     const colors = {
-      video: '#4CAF50',
-      audio: '#2196F3',
-      text: '#FF9800',
-      effect: '#9C27B0'
+      backgroundVideo: '#4CAF50',
+      sticker: '#FF9800',
+      digitalHuman: '#2196F3',
+      voiceOver: '#9C27B0'
     };
     return colors[type] || '#666';
   };
@@ -243,7 +254,11 @@ const TimeLine: React.FC = () => {
       }
     } else {
       // 点击空白区域，设置当前时间
-      const time = getTimeFromPosition(x, canvas.width);
+      const paddingLeft = 20;
+      const paddingRight = 20;
+      const contentWidth = canvas.width - paddingLeft - paddingRight;
+      const relativeX = x - paddingLeft;
+      const time = getTimeFromPosition(relativeX, contentWidth);
       setCurrentTime(time);
       selectItem(null);
     }
@@ -275,26 +290,35 @@ const TimeLine: React.FC = () => {
       const deltaTime = getTimeFromPosition(x - dragStartX, contentWidth);
       const newStartTime = Math.max(0, dragStartTime + deltaTime);
       
-      const trackIndex = tracks.findIndex(track =>
-        track.some(item => item.id === selectedItemId)
-      );
+      // 找到包含选中项目的轨道
+      let foundTrackIndex = -1;
+      for (let i = 0; i < tracks.length; i++) {
+        if (tracks[i].items.some(item => item.id === selectedItemId)) {
+          foundTrackIndex = i;
+          break;
+        }
+      }
       
-      if (trackIndex !== -1) {
-        updateTrackItem(trackIndex, selectedItemId, { startTime: newStartTime });
+      if (foundTrackIndex !== -1) {
+        updateTrackItem(foundTrackIndex, selectedItemId, { startTime: newStartTime });
       }
     } else if (isResizing && selectedItemId) {
       // 拉伸轨道项
-      const trackIndex = tracks.findIndex(track =>
-        track.some(item => item.id === selectedItemId)
-      );
-      
-      if (trackIndex !== -1) {
-        const item = tracks[trackIndex].find(item => item.id === selectedItemId);
+      let foundTrackIndex = -1;
+      let foundItem: TrackItem | null = null;
+      for (let i = 0; i < tracks.length; i++) {
+        const item = tracks[i].items.find(item => item.id === selectedItemId);
         if (item) {
-          const relativeX = x - paddingLeft;
-          const newDuration = Math.max(0.1, getTimeFromPosition(relativeX, contentWidth) - item.startTime);
-          updateTrackItem(trackIndex, selectedItemId, { duration: newDuration });
+          foundTrackIndex = i;
+          foundItem = item;
+          break;
         }
+      }
+      
+      if (foundTrackIndex !== -1 && foundItem) {
+        const relativeX = x - paddingLeft;
+        const newDuration = Math.max(0.1, getTimeFromPosition(relativeX, contentWidth) - foundItem.startTime);
+        updateTrackItem(foundTrackIndex, selectedItemId, { duration: newDuration });
       }
     }
   };
@@ -319,15 +343,18 @@ const TimeLine: React.FC = () => {
     const paddingRight = 20;
     const contentWidth = canvas.width - paddingLeft - paddingRight;
     const pixelsPerSecond = (contentWidth / duration) * zoomLevel;
-    const trackHeight = 40;
-    const headerHeight = 30;
+    const headerHeight = 50;
     const trackSpacing = 10;
 
+    let currentY = headerHeight;
     for (let trackIndex = 0; trackIndex < tracks.length; trackIndex++) {
-      const trackY = headerHeight + trackIndex * (trackHeight + trackSpacing);
+      const track = tracks[trackIndex];
+      const trackHeight = track.trackHeight;
+      const trackY = currentY;
       
       if (y >= trackY && y <= trackY + trackHeight) {
-        for (const item of tracks[trackIndex]) {
+        // 检查轨道中的每个项目
+        for (const item of track.items) {
           const itemX = paddingLeft + item.startTime * pixelsPerSecond;
           const itemWidth = item.duration * pixelsPerSecond;
           
@@ -336,6 +363,8 @@ const TimeLine: React.FC = () => {
           }
         }
       }
+      
+      currentY += trackHeight + trackSpacing;
     }
     
     return null;
@@ -350,11 +379,17 @@ const TimeLine: React.FC = () => {
     const paddingRight = 20;
     const contentWidth = canvas.width - paddingLeft - paddingRight;
     const pixelsPerSecond = (contentWidth / duration) * zoomLevel;
-    const trackHeight = 40;
-    const headerHeight = 30;
+    const headerHeight = 50;
     const trackSpacing = 10;
     
-    const trackY = headerHeight + clickedItem.trackIndex * (trackHeight + trackSpacing);
+    let currentY = headerHeight;
+    for (let i = 0; i < clickedItem.trackIndex; i++) {
+      currentY += tracks[i].trackHeight + trackSpacing;
+    }
+    
+    const track = tracks[clickedItem.trackIndex];
+    const trackHeight = track.trackHeight;
+    const trackY = currentY;
     const itemX = paddingLeft + clickedItem.item.startTime * pixelsPerSecond;
     const itemWidth = clickedItem.item.duration * pixelsPerSecond;
     
@@ -382,7 +417,7 @@ const TimeLine: React.FC = () => {
   return (
     <div
       ref={containerRef}
-      className="w-full h-1/3 shadow px-4 box-border bg-[#262626] overflow-hidden"
+      className="w-full h-1/3 shadow bg-[#262626] overflow-hidden"
     >
       <canvas
         ref={canvasRef}

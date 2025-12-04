@@ -39,6 +39,16 @@ export const appTexts = {
     userManagement: '用户管理',
     systemSettings: '系统设置',
     logout: '退出登录',
+    material: '素材',
+    image: '图片',
+    imageName: '图片名称',
+    placeholderImageName: '请输入图片名称',
+    search: '搜索',
+    reset: '重置',
+    edit: '编辑',
+    delete: '删除',
+    confirmDelete: '确定要删除吗？',
+    add: '新增'
   },
   'en-US': {
     home: 'Home',
@@ -56,6 +66,16 @@ export const appTexts = {
     userManagement: 'User Management',
     systemSettings: 'System Settings',
     logout: 'Logout',
+    material: 'Material',
+    image: 'Image',
+    imageName: 'Picture ame',
+    placeholderImageName: 'Please enter the name of the picture',
+    search: 'Search',
+    reset: 'Reset',
+    edit: 'Edit',
+    delete: 'Delete',
+    confirmDelete: 'Are you sure you want to delete it ?',
+    add: 'Add'
   },
 };
 

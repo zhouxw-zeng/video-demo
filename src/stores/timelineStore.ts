@@ -3,11 +3,20 @@ import { create } from 'zustand';
 // 轨道项类型定义
 export interface TrackItem {
   id: string;
-  type: 'video' | 'audio' | 'text' | 'effect';
+  type: 'backgroundVideo' | 'sticker' | 'digitalHuman' | 'voiceOver';
   startTime: number; // 开始时间（秒）
   duration: number; // 持续时间（秒）
   name: string;
   color?: string;
+}
+
+// 轨道定义
+export interface Track {
+  id: string;
+  type: 'backgroundVideo' | 'sticker' | 'digitalHuman' | 'voiceOver';
+  name: string;
+  trackHeight: number; // 轨道高度
+  items: TrackItem[]; // 轨道中的项目
 }
 
 // 时间轴状态接口
@@ -19,7 +28,7 @@ export interface TimelineState {
   fps: number; // 帧率
   
   // 轨道数据
-  tracks: TrackItem[][]; // 多个轨道，每个轨道包含多个轨道项
+  tracks: Track[]; // 轨道数组，每个轨道包含多个项目
   
   // 交互状态
   isDragging: boolean;
@@ -53,13 +62,65 @@ export const useTimelineStore = create<TimelineState>((set, get) => ({
   // 初始状态
   zoomLevel: 1,
   currentTime: 0,
-  duration: 60, // 默认60秒
+  duration: 30, // 默认60秒
   fps: 30,
   
   tracks: [
-    [], // 视频轨道
-    [], // 音频轨道
-    []  // 效果轨道
+    {
+      id: 'track_2',
+      type: 'sticker',
+      name: '贴图轨道',
+      trackHeight: 20,
+      items: [] // 贴图可以添加多个，初始为空
+    },
+    {
+      id: 'track_3',
+      type: 'digitalHuman',
+      name: '数字人轨道',
+      trackHeight: 30,
+      items: [
+        // {
+        //   id: 'item_3',
+        //   type: 'digitalHuman',
+        //   startTime: 0,
+        //   duration: 30, // 同步视频时长
+        //   name: '数字人1',
+        //   color: '#2196F3'
+        // }
+      ]
+    },
+    {
+      id: 'track_4',
+      type: 'voiceOver',
+      name: '配音轨道',
+      trackHeight: 20,
+      items: [
+        // {
+        //   id: 'item_4',
+        //   type: 'voiceOver',
+        //   startTime: 0,
+        //   duration: 5, // 选中音频时长（示例值）
+        //   name: '配音1',
+        //   color: '#9C27B0'
+        // }
+      ]
+    },
+    {
+      id: 'track_1',
+      type: 'backgroundVideo',
+      name: '背景视频轨道',
+      trackHeight: 80,
+      items: [
+        // {
+        //   id: 'item_1',
+        //   type: 'backgroundVideo',
+        //   startTime: 0,
+        //   duration: 30, // 同步视频时长
+        //   name: '背景视频1',
+        //   color: '#4CAF50'
+        // }
+      ]
+    },
   ],
   
   isDragging: false,
@@ -85,7 +146,10 @@ export const useTimelineStore = create<TimelineState>((set, get) => ({
         id: `item_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
       };
       const newTracks = [...tracks];
-      newTracks[trackIndex] = [...newTracks[trackIndex], newItem];
+      newTracks[trackIndex] = {
+        ...newTracks[trackIndex],
+        items: [...newTracks[trackIndex].items, newItem]
+      };
       set({ tracks: newTracks });
     }
   },
@@ -94,8 +158,11 @@ export const useTimelineStore = create<TimelineState>((set, get) => ({
     const { tracks, selectedItemId } = get();
     if (trackIndex >= 0 && trackIndex < tracks.length) {
       const newTracks = [...tracks];
-      newTracks[trackIndex] = newTracks[trackIndex].filter(item => item.id !== itemId);
-      set({ 
+      newTracks[trackIndex] = {
+        ...newTracks[trackIndex],
+        items: newTracks[trackIndex].items.filter(item => item.id !== itemId)
+      };
+      set({
         tracks: newTracks,
         selectedItemId: selectedItemId === itemId ? null : selectedItemId
       });
@@ -106,24 +173,23 @@ export const useTimelineStore = create<TimelineState>((set, get) => ({
     const { tracks } = get();
     if (trackIndex >= 0 && trackIndex < tracks.length) {
       const newTracks = [...tracks];
-      newTracks[trackIndex] = newTracks[trackIndex].map(item =>
-        item.id === itemId ? { ...item, ...updates } : item
-      );
+      newTracks[trackIndex] = {
+        ...newTracks[trackIndex],
+        items: newTracks[trackIndex].items.map(item =>
+          item.id === itemId ? { ...item, ...updates } : item
+        )
+      };
       set({ tracks: newTracks });
     }
   },
   
   moveTrackItem: (fromTrack, toTrack, itemId) => {
     const { tracks } = get();
-    if (fromTrack >= 0 && fromTrack < tracks.length && 
+    if (fromTrack >= 0 && fromTrack < tracks.length &&
         toTrack >= 0 && toTrack < tracks.length) {
-      const item = tracks[fromTrack].find(item => item.id === itemId);
-      if (item) {
-        const newTracks = [...tracks];
-        newTracks[fromTrack] = newTracks[fromTrack].filter(item => item.id !== itemId);
-        newTracks[toTrack] = [...newTracks[toTrack], item];
-        set({ tracks: newTracks });
-      }
+      // 由于现在每个轨道只有一个项目，移动操作需要重新设计
+      // 暂时保留空实现，因为新的数据结构下移动轨道的逻辑不同
+      console.log('moveTrackItem not implemented for new track structure');
     }
   },
   

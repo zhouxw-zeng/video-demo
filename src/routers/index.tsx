@@ -5,6 +5,7 @@ import About from '../views/about/About';
 import Settings from '../views/settings/Settings';
 import Login from '../views/login/Login';
 import VideoClip from '../views/video-clip/VideoClip';
+import Image from '../views/material/image/Image'
 
 const router = createBrowserRouter([
   {
@@ -22,6 +23,10 @@ const router = createBrowserRouter([
       {
         path: 'settings',
         element: <Settings />,
+      },
+      {
+        path: 'material/image',
+        element: <Image />,
       },
     ],
   },

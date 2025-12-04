@@ -1,5 +1,6 @@
 import React from "react";
 import TimeLine from "../../components/TimeLine";
+import TimeLine1 from "../../components/Timeline1"; 
 import TimeLineDemo from "../../components/TimeLineDemo";
 import MainVideo from "../../components/MainVideo";
 import Material from "../../components/Material";
@@ -13,14 +14,21 @@ const VideoClip: React.FC = () => {
     <VideoProvider>
       <div className="flex w-dvw h-2/3 flex-1">
         <Material />
-        <div className="w-3/5 flex flex-col px-6 py-3  gap-2">
+        <div className="w-1/2 flex flex-col px-6 py-3  gap-2">
           <MainTool />
           <MainVideo />
+          {/* 数字人版 */}
+          <TimeLine1 />
         </div>
         <TonePainting />
       </div>
-      <TimeLine />
+      
+      {/* 剪辑版 */}
+      {/* <TimeLine /> */}
+      
+      {/* 测试版本 */}
       {/* <TimeLineDemo /> */}
+      
     </VideoProvider>
   </div>;
 }
